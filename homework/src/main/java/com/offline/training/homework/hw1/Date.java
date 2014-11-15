@@ -1,4 +1,4 @@
-package com.offline.training.homework;
+package com.offline.training.homework.hw1;
 
 /* Date.java */
 
