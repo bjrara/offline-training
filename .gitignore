@@ -1,0 +1,18 @@
+# mark gradle
+.gradle/
+build/
+
+# mark java/groovy
+*.class
+
+# mark eclipse
+.project
+.metadata
+.classpath
+.settings/
+bin/**
+
+# mark idea
+*.ipr
+*.iml
+*.iws
