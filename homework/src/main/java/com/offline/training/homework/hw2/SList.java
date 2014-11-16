@@ -114,8 +114,10 @@ public class SList {
   public void squish() {
 	  SListNode shead = head;
 	  while (shead != null) {
-			if (shead.next != null && shead.item.equals(shead.next.item))
+			if (shead.next != null && shead.item.equals(shead.next.item)) {
 				shead.next = shead.next.next;
+				size--;
+			}
 			else
 				shead = shead.next;
 		}
@@ -139,6 +141,7 @@ public class SList {
 			  SListNode copy = new SListNode(shead.item, shead.next);
 			  shead.next = copy;
 			  shead = copy.next;
+			  size++;
 		  }
 	  }
 		  
