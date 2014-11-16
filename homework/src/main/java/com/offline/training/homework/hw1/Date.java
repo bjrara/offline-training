@@ -6,11 +6,13 @@ import java.io.*;
 
 class Date {
 
+	// use System.out.println() instead of Logger
+	private static final String ERROR = "ERROR ";
+	private static final String WARN = "WARN ";
+
 	private int month;
 	private int day;
 	private int year;
-
-	/* Put your private data fields here. */
 
 	/**
 	 * Constructs a date with the given month, day and year. If the date is not
@@ -25,8 +27,8 @@ class Date {
 	 */
 	public Date(int month, int day, int year) {
 		if (!Date.isValidDate(month, day, year)) {
-			// TODO replace with log
-			System.out.println("Invalid date");
+			System.out.println(ERROR
+					+ "Constructing class failed: Invalid date.");
 			System.exit(0);
 		}
 		this.month = month;
@@ -57,7 +59,8 @@ class Date {
 		if (compo[2].length() < 1 || compo[0].length() > 4)
 			valid = false;
 		if (!valid) {
-			System.out.println("Invalid date format.");
+			System.out.println(ERROR
+					+ "Constructing class failed: Invalid date format.");
 			System.exit(0);
 		}
 		try {
@@ -66,14 +69,16 @@ class Date {
 			int year = Integer.parseInt(compo[2]);
 
 			if (!Date.isValidDate(month, day, year)) {
-				System.out.println("Invalid date.");
+				System.out.println(ERROR
+						+ "Constructing class failed: Invalid date.");
 				System.exit(0);
 			}
 			this.month = month;
 			this.day = day;
 			this.year = year;
 		} catch (NumberFormatException e) {
-			System.out.println("Invalid digits found.");
+			System.out.println(ERROR
+					+ "Constructing class failed: Invalid digits found.");
 			System.exit(0);
 		}
 	}
@@ -84,7 +89,7 @@ class Date {
 	 * @return true if and only if the input year is a leap year.
 	 */
 	public static boolean isLeapYear(int year) {
-		if (year % 4 == 0) {
+		if (year > 0 && year % 4 == 0) {
 			if (year % 100 == 0 && year % 400 != 0)
 				return false;
 			return true;
@@ -122,6 +127,7 @@ class Date {
 			return 28;
 		}
 		default:
+			System.out.println(WARN + "Call daysInMonth failed: Invalid date.");
 			return 0;
 		}
 	}
@@ -134,13 +140,8 @@ class Date {
 	 *         Years prior to A.D. 1 are NOT valid.
 	 */
 	public static boolean isValidDate(int month, int day, int year) {
-		if (year <= 0)
-			return false;
-		if (month < 1 || month > 12)
-			return false;
-		if (day < 1 || day > Date.daysInMonth(month, year))
-			return false;
-		return true;
+		return (year >= 1) && (month >= 1 && month <= 12)
+				&& (day >= 1 && day <= Date.daysInMonth(month, year));
 	}
 
 	/**
@@ -160,8 +161,11 @@ class Date {
 	 * @return true if and only if this Date is before d.
 	 */
 	public boolean isBefore(Date d) {
-		if (d == null)
-			throw new RuntimeException("Input date is null.");
+		if (d == null) {
+			System.out.println(ERROR
+					+ "Call isBefore failed: Input date is null.");
+			System.exit(0);
+		}
 		if (d.year > this.year)
 			return true;
 		if (d.year == this.year) {
@@ -180,8 +184,11 @@ class Date {
 	 * @return true if and only if this Date is after d.
 	 */
 	public boolean isAfter(Date d) {
-		if (d == null)
-			throw new RuntimeException("Input date is null.");
+		if (d == null) {
+			System.out.println(ERROR
+					+ "Call isAfter failed: Input date is null.");
+			System.exit(0);
+		}
 		if (d.year == this.year && d.month == this.month && d.day == this.day)
 			return false;
 		return !isBefore(d);
