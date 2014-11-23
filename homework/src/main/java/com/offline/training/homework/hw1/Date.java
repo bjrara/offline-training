@@ -152,7 +152,7 @@ class Date {
 	 * @return a String representation of this date.
 	 */
 	public String toString() {
-		return String.format("%d/%d/%d", month, day, year);
+		return month + "/" + day + "/" + year;
 	}
 
 	/**
