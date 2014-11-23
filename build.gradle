@@ -15,3 +15,10 @@ project(':homework') {
     testCompile 'junit:junit:4.11'
   }
 }
+
+project(':project') {
+  dependencies {
+    testCompile 'junit:junit:4.11'
+    compile files('libs/jai_core.jar')
+  }
+}
