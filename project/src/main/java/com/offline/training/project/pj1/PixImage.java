@@ -1,5 +1,8 @@
 package com.offline.training.project.pj1;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /* PixImage.java */
 
 /**
@@ -23,9 +26,13 @@ public class PixImage {
    *  Define any variables associated with a PixImage object here.  These
    *  variables MUST be private.
    */
+	private int width;
+	private int height;
 
+	private PixDot[][] pixStore;
 
-
+	private final short[][] xKernel = new short[][] {{-1,0,1},{-2,0,2},{-1,0,1}};
+	private final short[][] yKernel = new short[][] {{1,2,1},{0,0,0},{-1,-2,-1}};	
 
   /**
    * PixImage() constructs an empty PixImage with a specified width and height.
@@ -35,7 +42,15 @@ public class PixImage {
    * @param height the height of the image.
    */
   public PixImage(int width, int height) {
-    // Your solution here.
+	  this.width = width;
+	  this.height = height;
+	  this.pixStore = new PixDot[this.width][this.height];
+
+	  for (int i = 0; i < this.width; i++) {
+		  for (int j = 0; j < this.height; j++) {
+			  this.pixStore[i][j] = new PixDot();
+		  }
+	  }
   }
 
   /**
@@ -45,7 +60,7 @@ public class PixImage {
    */
   public int getWidth() {
     // Replace the following line with your solution.
-    return 1;
+    return width;
   }
 
   /**
@@ -55,7 +70,7 @@ public class PixImage {
    */
   public int getHeight() {
     // Replace the following line with your solution.
-    return 1;
+    return height;
   }
 
   /**
@@ -67,7 +82,7 @@ public class PixImage {
    */
   public short getRed(int x, int y) {
     // Replace the following line with your solution.
-    return 0;
+    return pixStore[x][y].getRed();
   }
 
   /**
@@ -79,7 +94,7 @@ public class PixImage {
    */
   public short getGreen(int x, int y) {
     // Replace the following line with your solution.
-    return 0;
+    return pixStore[x][y].getGreen();
   }
 
   /**
@@ -91,7 +106,7 @@ public class PixImage {
    */
   public short getBlue(int x, int y) {
     // Replace the following line with your solution.
-    return 0;
+    return pixStore[x][y].getBlue();
   }
 
   /**
@@ -108,7 +123,10 @@ public class PixImage {
    * @param blue the new blue intensity for the pixel at coordinate (x, y).
    */
   public void setPixel(int x, int y, short red, short green, short blue) {
-    // Your solution here.
+	  PixDot dot = pixStore[x][y];
+	  dot.setRed(red);
+	  dot.setGreen(green);
+	  dot.setBlue(blue);
   }
 
   /**
@@ -121,8 +139,14 @@ public class PixImage {
    * @return a String representation of this PixImage.
    */
   public String toString() {
-    // Replace the following line with your solution.
-    return "";
+	  String out = "-----------------------";
+	  for (int i = 0; i < this.width; i++) {
+		  for (int j = 0; j < this.height; j++) {
+			  out += " | " + pixStore[i][j].toString() + " |";
+		  }
+		  out += "-----------------------\n";
+	  }
+	  return out;
   }
 
   /**
@@ -155,9 +179,49 @@ public class PixImage {
    * @return a blurred version of "this" PixImage.
    */
   public PixImage boxBlur(int numIterations) {
-    // Replace the following line with your solution.
-    return this;
+	  if (numIterations <= 0)
+		  return this;
+	  PixImage copy = this;
+	  for (int i = 0; i < numIterations; i++) {
+		  copy = copy.blur();
+	  }
+	  return copy;
   }
+
+  private PixImage blur() {
+	  PixImage copy = new PixImage(this.width, this.height);
+	  for (int i = 0; i < this.width; i++) {
+		  for (int j = 0; j < this.height; j++) {
+			  int totalRed, totalGreen, totalBlue;
+			  totalRed = totalGreen = totalBlue = 0;
+			  PixDot[] neighbors = findNeighbors(i, j);
+			  for (PixDot dot : neighbors) {
+				  totalRed += dot.red;
+				  totalGreen += dot.green;
+				  totalBlue += dot.blue;
+			  }
+			  int count = neighbors.length;
+			  copy.setPixel(i, j, 
+					  (short)(totalRed / count), 
+					  (short)(totalGreen / count), 
+					  (short)(totalBlue / count));
+		  }
+	  }
+	  return copy;
+  }
+  
+	private PixDot[] findNeighbors(int x, int y) {
+		List<PixDot> neighbors = new ArrayList<PixDot>();
+		for (int i = x - 1; i < x + 2; i++) {
+			if (i >= 0 && i < this.width) {
+				for (int j = y - 1; j < y + 2; j++) {
+					if (j >= 0 && j < this.height)
+						neighbors.add(pixStore[i][j]);
+				}
+			}
+		}
+		return neighbors.toArray(new PixDot[neighbors.size()]);
+	}
 
   /**
    * mag2gray() maps an energy (squared vector magnitude) in the range
@@ -200,10 +264,56 @@ public class PixImage {
    * Whiter pixels represent stronger edges.
    */
   public PixImage sobelEdges() {
-    // Replace the following line with your solution.
-    return this;
-    // Don't forget to use the method mag2gray() above to convert energies to
-    // pixel intensities.
+	  PixImage copy = new PixImage(this.width, this.height);
+	  for (int i = 0; i < this.width; i++) {
+		  for (int j = 0; j < this.height; j++) {
+			  short colorIntensity = mag2gray(energy(i, j));
+			  copy.setPixel(i, j, colorIntensity, colorIntensity, colorIntensity);
+		  }
+	  }
+	  return copy;
+  }
+  
+  private long energy(int x, int y) {
+	  long energy = 0L;
+	  for (int i = 0; i < 3; i++) {
+		  short[][] colorNeighbors = getNonEmptyColorNeighbors(x, y, i);
+		  long[] gradient = colorGradient(colorNeighbors);
+		  energy += (gradient[0] * gradient[0] + gradient[1] * gradient[1]);
+	  }
+	  return energy;
+  }
+  
+  private long[] colorGradient(short[][] colorNeighbors) {
+	  long x = 0L, y = 0L;
+	  for(int i = 0; i < 3; i++) {
+		  for (int j = 0; j < 3; j++) {
+			  x += (long)(xKernel[i][j] * colorNeighbors[i][j]);
+			  y += (long)(yKernel[i][j] * colorNeighbors[i][j]);
+		  }
+	  }
+	  return new long[] {x, y};
+  }
+
+  // red: 0 green:1 blue:2
+  private short[][] getNonEmptyColorNeighbors(int x, int y, int color) {
+		short[][] neighbors = new short[3][3];
+		for (int i = 0; i < 3; i++) {
+			int xx = x + i - 1;
+			if (xx < 0)
+				xx = 0;
+			else if (xx >= this.width)
+				xx = this.width - 1;
+			for (int j = 0; j < 3; j++) {
+				int yy = y + j - 1;
+				if (yy < 0)
+					yy = 0;
+				else if (yy >= this.height)
+					yy = this.height - 1;
+				neighbors[i][j] = pixStore[xx][yy].getColor(color);
+			}
+	  }
+	  return neighbors;
   }
 
 
@@ -340,4 +450,57 @@ public class PixImage {
                                         { 74, 143, 122 } })),
            "Incorrect Sobel:\n" + image2.sobelEdges());
   }
+  
+	private class PixDot {
+		private short red;
+		private short green;
+		private short blue;
+		
+		public PixDot() {
+			this.red = 255;
+			this.green = 255;
+			this.blue = 255;
+		}
+		
+		public short getColor(int color) {
+			switch (color) {
+			case 0:
+				return getRed();
+			case 1:
+				return getGreen();
+			case 2:
+				return getBlue();
+			default:
+				return 255;
+			}
+		}
+
+		public short getRed() {
+			return red;
+		}
+
+		public void setRed(short red) {
+			this.red = red;
+		}
+
+		public short getGreen() {
+			return green;
+		}
+
+		public void setGreen(short green) {
+			this.green = green;
+		}
+
+		public short getBlue() {
+			return blue;
+		}
+
+		public void setBlue(short blue) {
+			this.blue = blue;
+		}
+
+		public String toString() {
+			return "[" + this.red + "," + this.green + "," + this.blue + "]";
+		}
+	}
 }
