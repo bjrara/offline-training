@@ -29,7 +29,7 @@ public class PixImage {
 	private int width;
 	private int height;
 
-	private PixDot[][] pixStore;
+	private Pixel[][] pixStore;
 
 	private final short[][] xKernel = new short[][] {{-1,0,1},{-2,0,2},{-1,0,1}};
 	private final short[][] yKernel = new short[][] {{1,2,1},{0,0,0},{-1,-2,-1}};	
@@ -44,11 +44,11 @@ public class PixImage {
   public PixImage(int width, int height) {
 	  this.width = width;
 	  this.height = height;
-	  this.pixStore = new PixDot[this.width][this.height];
+	  this.pixStore = new Pixel[this.width][this.height];
 
 	  for (int i = 0; i < this.width; i++) {
 		  for (int j = 0; j < this.height; j++) {
-			  this.pixStore[i][j] = new PixDot();
+			  this.pixStore[i][j] = new Pixel();
 		  }
 	  }
   }
@@ -123,7 +123,7 @@ public class PixImage {
    * @param blue the new blue intensity for the pixel at coordinate (x, y).
    */
   public void setPixel(int x, int y, short red, short green, short blue) {
-	  PixDot dot = pixStore[x][y];
+	  Pixel dot = pixStore[x][y];
 	  dot.setRed(red);
 	  dot.setGreen(green);
 	  dot.setBlue(blue);
@@ -194,8 +194,8 @@ public class PixImage {
 		  for (int j = 0; j < this.height; j++) {
 			  int totalRed, totalGreen, totalBlue;
 			  totalRed = totalGreen = totalBlue = 0;
-			  PixDot[] neighbors = findNeighbors(i, j);
-			  for (PixDot dot : neighbors) {
+			  Pixel[] neighbors = findNeighbors(i, j);
+			  for (Pixel dot : neighbors) {
 				  totalRed += dot.red;
 				  totalGreen += dot.green;
 				  totalBlue += dot.blue;
@@ -210,8 +210,8 @@ public class PixImage {
 	  return copy;
   }
   
-	private PixDot[] findNeighbors(int x, int y) {
-		List<PixDot> neighbors = new ArrayList<PixDot>();
+	private Pixel[] findNeighbors(int x, int y) {
+		List<Pixel> neighbors = new ArrayList<Pixel>();
 		for (int i = x - 1; i < x + 2; i++) {
 			if (i >= 0 && i < this.width) {
 				for (int j = y - 1; j < y + 2; j++) {
@@ -220,7 +220,7 @@ public class PixImage {
 				}
 			}
 		}
-		return neighbors.toArray(new PixDot[neighbors.size()]);
+		return neighbors.toArray(new Pixel[neighbors.size()]);
 	}
 
   /**
@@ -451,12 +451,12 @@ public class PixImage {
            "Incorrect Sobel:\n" + image2.sobelEdges());
   }
   
-	private class PixDot {
+	private class Pixel {
 		private short red;
 		private short green;
 		private short blue;
 		
-		public PixDot() {
+		public Pixel() {
 			this.red = 255;
 			this.green = 255;
 			this.blue = 255;
