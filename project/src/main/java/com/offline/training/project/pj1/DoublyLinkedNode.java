@@ -20,6 +20,10 @@ public class DoublyLinkedNode {
 		runLength++;
 	}
 
+	public void Decrement() {
+		runLength--;
+	}
+
 	public int getRed() {
 		return red;
 	}

@@ -167,8 +167,13 @@ public class RunLengthEncoding implements Iterable {
    *  @return a String representation of this RunLengthEncoding.
    */
   public String toString() {
-    // Replace the following line with your solution.
-    return "";
+	  String stringValue = "";
+	  RunIterator itr = iterator();
+	  while(itr.hasNext()) {
+		  int[] run = itr.next();
+		  stringValue += String.format("[%d,%d,%d,%d], ", run[0], run[1], run[2], run[3]);
+	  }
+	  return stringValue;
   }
 
 
@@ -254,10 +259,85 @@ public class RunLengthEncoding implements Iterable {
    *  @param green the new green intensity to store at coordinate (x, y).
    *  @param blue the new blue intensity to store at coordinate (x, y).
    */
-  public void setPixel(int x, int y, short red, short green, short blue) {
-    // Your solution here, but you should probably leave the following line
-    //   at the end.
-    check();
+	public void setPixel(int x, int y, short red, short green, short blue) {
+		DoublyLinkedNode curr = runs.head;
+		int index = x + y * width;
+		int currIndex, previousIndex;
+		currIndex = previousIndex = -1;
+
+		while (curr != null) {
+			previousIndex = currIndex;
+			currIndex += curr.getRunLength();
+			if (currIndex >= index)
+				break;
+			curr = curr.getNext();
+		}
+
+		if (curr.getRed() == (int) red && curr.getGreen() == (int) green
+				&& curr.getBlue() == (int) blue) {
+			return;
+		} else {
+			if (index == previousIndex + 1) {
+				if (tryMerge(curr, curr.getPrevious(), red, green, blue)) {
+					if (curr.getRunLength() == 0) {
+						curr.getPrevious().setNext(curr.getNext());
+					}
+					return;
+				}
+			}
+			if (index == currIndex) {
+				if (tryMerge(curr, curr.getNext(), red, green, blue)) {
+					if (curr.getRunLength() == 0) {
+						curr.getNext().setPrevious(curr.getPrevious());
+					}
+					return;
+				}
+			}
+			split(curr, red, green, blue, 
+					index - previousIndex - 1, currIndex - index);
+			if (curr == runs.head && curr.getPrevious() != null)
+				runs.head = curr.getPrevious();
+		}
+		check();
+	}
+
+	private boolean tryMerge(DoublyLinkedNode curr, DoublyLinkedNode target,
+			int red, int green, int blue) {
+		if (target == null)
+			return false;
+		if (target.getRed() == (int) red && target.getGreen() == (int) green
+				&& target.getBlue() == (int) blue) {
+			target.Increment();
+			curr.Decrement();
+			return true;
+		}
+		return false;
+	}
+
+	private void split(DoublyLinkedNode curr, int red, int green, int blue,
+			int previousRunLength, int nextRunLength) {
+		DoublyLinkedNode previousRun, nextRun;
+		previousRun = previousRunLength <= 0 ? curr.getPrevious()
+				: new DoublyLinkedNode(previousRunLength, (int) curr.getRed(),
+						(int) curr.getGreen(), (int) curr.getBlue());
+		nextRun = nextRunLength <= 0 ? curr.getNext() : new DoublyLinkedNode(
+				nextRunLength, (int) curr.getRed(), (int) curr.getGreen(),
+				(int) curr.getBlue());
+		curr.setValue(red, green, blue, 1);
+		if (previousRunLength > 0) {
+			if (curr.getPrevious() != null)
+				curr.getPrevious().setNext(previousRun);
+			previousRun.setPrevious(curr.getPrevious());
+			previousRun.setNext(curr);
+		}
+		if (nextRunLength > 0) {
+			nextRun.setPrevious(curr);
+			nextRun.setNext(curr.getNext());
+			if (curr.getNext() != null)
+				curr.getNext().setPrevious(nextRun);
+		}
+		curr.setPrevious(previousRun);
+		curr.setNext(nextRun);
   }
 
 
