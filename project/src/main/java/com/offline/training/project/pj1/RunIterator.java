@@ -38,26 +38,20 @@ public class RunIterator implements Iterator {
    *  Define any variables associated with a RunIterator object here.
    *  These variables MUST be private.
    */
-
-
-
+	transient DoublyLinkedNode next;
 
   /**
    *  RunIterator() constructs a new iterator starting with a specified run.
    *
-   *  @param node the run where this iterator starts.
+   *  @param heads node the run where this iterator starts
+   *  It is an array of 4 DoublyLinkedNodes that specify the current run in the sequence.
+   *  The pixel node is in index [0]; the red node is in index [1]; the green
+   *  node is in index [2]; and the blue node is in index [3].
    */
-  // Unlike all the other methods we have asked you to write, the RunIterator()
-  // constructor does not have a predefined signature, because no outside
-  // class should ever call this constructor except the iterator() method in
-  // the RunLengthEncoding class.  The correct way for outside classes to
-  // get access to a RunIterator is to call the iterator() method on a
-  // RunLengthEncoding object.  You are welcome to add any parameters to the
-  // constructor that you want so that your RunLengthEncoding.iterator()
-  // implementation can construct a RunIterator that points to the first run of
-  // the encoding.
-  RunIterator() {
-    // Your solution here.  You may add parameters to the method signature.
+  RunIterator(DoublyLinkedNode head) {
+		if (head != null) {
+			next = head;
+		}
   }
 
   /**
@@ -67,8 +61,7 @@ public class RunIterator implements Iterator {
    *  @return true if the iterator has more elements.
    */
   public boolean hasNext() {
-    // Replace the following line with your solution.
-    return false;
+	  return next != null;
   }
 
   /**
@@ -93,12 +86,13 @@ public class RunIterator implements Iterator {
    *  for the sole purpose of returning four ints.
    */
   public int[] next() {
-    // Construct a new array of 4 ints, fill in its values, and return it.
-    // Don't forget to advance the RunIterator's pointer so that the next
-    // call to next() will return the subsequent run.
-
-    // Replace the following line with your solution.
-    return new int[4];
+		if (next != null) {
+			DoublyLinkedNode currNext = next;
+			next = next.getNext();
+			return new int[] { currNext.getRunLength(), currNext.getRed(),
+					currNext.getGreen(), currNext.getBlue() };
+		}
+	  throw new NoSuchElementException("Iterator reaches the end of the list.");
   }
 
   /**

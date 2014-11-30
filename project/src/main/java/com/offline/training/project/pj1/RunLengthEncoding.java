@@ -26,14 +26,14 @@ package com.offline.training.project.pj1;
 import java.util.Iterator;
 
 public class RunLengthEncoding implements Iterable {
+	private int width;
+	private int height;
+	private DoublyLinkedList runs;
 
   /**
    *  Define any variables associated with a RunLengthEncoding object here.
    *  These variables MUST be private.
    */
-
-
-
 
   /**
    *  The following methods are required for Part II.
@@ -49,7 +49,7 @@ public class RunLengthEncoding implements Iterable {
    */
 
   public RunLengthEncoding(int width, int height) {
-    // Your solution here.
+	  this(width, height, new int[] {255}, new int[] {255}, new int[] {255}, new int[] {width * height});
   }
 
   /**
@@ -75,7 +75,26 @@ public class RunLengthEncoding implements Iterable {
 
   public RunLengthEncoding(int width, int height, int[] red, int[] green,
                            int[] blue, int[] runLengths) {
-    // Your solution here.
+	  if (!validate(width, height, red.length, green.length, blue.length, runLengths)) {
+		  throw new RuntimeException("Validation failed during constructing model");
+	  }
+	  this.width = width;
+	  this.height = height;
+	  this.runs = new DoublyLinkedList(red, green, blue, runLengths);
+  }
+
+  private boolean validate(int width, int height, int redLength, int greenLength,
+		  int blueLength, int[] runLengths) {
+	  if(redLength == greenLength && redLength == blueLength && redLength == runLengths.length) {
+		  long sum = 0;
+		  for(long i : runLengths) {
+			  sum += i;
+		  }
+		  if (sum == width * height) {
+			  return true;
+		  }
+	  }
+	  return false;
   }
 
   /**
@@ -87,7 +106,7 @@ public class RunLengthEncoding implements Iterable {
 
   public int getWidth() {
     // Replace the following line with your solution.
-    return 1;
+    return width;
   }
 
   /**
@@ -98,7 +117,7 @@ public class RunLengthEncoding implements Iterable {
    */
   public int getHeight() {
     // Replace the following line with your solution.
-    return 1;
+    return height;
   }
 
   /**
@@ -109,10 +128,7 @@ public class RunLengthEncoding implements Iterable {
    *  RunLengthEncoding.
    */
   public RunIterator iterator() {
-    // Replace the following line with your solution.
-    return null;
-    // You'll want to construct a new RunIterator, but first you'll need to
-    // write a constructor in the RunIterator class.
+		return new RunIterator(runs.head);
   }
 
   /**
@@ -122,8 +138,23 @@ public class RunLengthEncoding implements Iterable {
    *  @return the PixImage that this RunLengthEncoding encodes.
    */
   public PixImage toPixImage() {
-    // Replace the following line with your solution.
-    return new PixImage(1, 1);
+	  PixImage img = new PixImage(width, height);
+	  RunIterator itr = iterator();
+	  int x, y;
+	  x = y = 0;
+	  while(itr.hasNext()) {
+		  int[] run = itr.next();
+		  for(int i = 0; i < run[0]; i++) {
+			  img.setPixel(x, y, (short)run[1], (short)run[2], (short)run[3]);
+			  if(x == width - 1) {
+				  x = 0;
+				  y++;
+			  } else {
+				  x++;
+			  }
+		  }
+	  }
+	  return img;
   }
 
   /**
@@ -155,9 +186,30 @@ public class RunLengthEncoding implements Iterable {
    *  @param image is the PixImage to run-length encode.
    */
   public RunLengthEncoding(PixImage image) {
-    // Your solution here, but you should probably leave the following line
-    // at the end.
-    check();
+		if (image == null || image.getHeight() == 0 || image.getWidth() == 0)
+			return;
+		width = image.getWidth();
+		height = image.getHeight();
+		runs = new DoublyLinkedList();
+		for (int y = 0; y < image.getHeight(); y++) {
+			for (int x = 0; x < image.getWidth(); x++) {
+				if (runs.tail == null) {
+					runs.add(1, image.getRed(0, 0), image.getGreen(0, 0),
+							image.getBlue(0, 0));
+					continue;
+				}
+				if (runs.tail.getRed() == (int) image.getRed(x, y)
+						&& runs.tail.getGreen() == (int) image.getGreen(x, y)
+						&& runs.tail.getBlue() == (int) image.getBlue(x, y)) {
+					runs.tail.Increment();
+				} else {
+					runs.add(1, (int) image.getRed(x, y),
+							(int) image.getGreen(x, y),
+							(int) image.getBlue(x, y));
+				}
+			}
+		}
+		check();
   }
 
   /**
@@ -166,7 +218,22 @@ public class RunLengthEncoding implements Iterable {
    *  all run lengths does not equal the number of pixels in the image.
    */
   public void check() {
-    // Your solution here.
+		RunIterator itr = iterator();
+		int[] curr = itr.hasNext() ? itr.next() : null;
+		if (curr == null)
+			return;
+		long sum = (long)curr[0];
+		while (itr.hasNext()) {
+			int[] next = itr.next();
+			if (curr[0] == next[0] && curr[1] == next[1] && curr[2] == next[2]
+					&& curr[3] == next[3]) {
+				throw new RuntimeException("Consecutive runs have been found.");
+			}
+			curr = next;
+			sum += (long)curr[0];
+		}
+		if (sum != width * height)
+			throw new RuntimeException("Invalid run lengths");
   }
 
 
