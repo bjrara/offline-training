@@ -89,8 +89,8 @@ public class RunIterator implements Iterator {
 		if (next != null) {
 			DoublyLinkedNode currNext = next;
 			next = next.getNext();
-			return new int[] { currNext.getRunLength(), currNext.getRed(),
-					currNext.getGreen(), currNext.getBlue() };
+			return new int[] { currNext.getValue().getRunLength(), currNext.getValue().getRed(),
+					currNext.getValue().getGreen(), currNext.getValue().getBlue() };
 		}
 	  throw new NoSuchElementException("Iterator reaches the end of the list.");
   }

@@ -26,12 +26,11 @@ public class DoublyLinkedList {
 		if (!(validateColor(red) && validateColor(green) && validateColor(blue))) {
 			throw new RuntimeException("Invalid pixel value found!");
 		}
-		DoublyLinkedNode appendObj = new DoublyLinkedNode(runLength, red,
-				green, blue);
+		DoublyLinkedNode appendObj = new DoublyLinkedNode(new Run(red, green, blue, runLength));
 		if (head == null) {
 			head = tail = appendObj;
 		} else {
-			appendObj.setPrevious(tail);
+	appendObj.setPrevious(tail);
 			tail.setNext(appendObj);
 			tail = tail.getNext();
 		}

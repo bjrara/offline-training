@@ -203,10 +203,10 @@ public class RunLengthEncoding implements Iterable {
 							image.getBlue(0, 0));
 					continue;
 				}
-				if (runs.tail.getRed() == (int) image.getRed(x, y)
-						&& runs.tail.getGreen() == (int) image.getGreen(x, y)
-						&& runs.tail.getBlue() == (int) image.getBlue(x, y)) {
-					runs.tail.Increment();
+				if (runs.tail.getValue().getRed() == (int) image.getRed(x, y)
+						&& runs.tail.getValue().getGreen() == (int) image.getGreen(x, y)
+						&& runs.tail.getValue().getBlue() == (int) image.getBlue(x, y)) {
+					runs.tail.getValue().Increment();
 				} else {
 					runs.add(1, (int) image.getRed(x, y),
 							(int) image.getGreen(x, y),
@@ -267,19 +267,19 @@ public class RunLengthEncoding implements Iterable {
 
 		while (curr != null) {
 			previousIndex = currIndex;
-			currIndex += curr.getRunLength();
+			currIndex += curr.getValue().getRunLength();
 			if (currIndex >= index)
 				break;
 			curr = curr.getNext();
 		}
 
-		if (curr.getRed() == (int) red && curr.getGreen() == (int) green
-				&& curr.getBlue() == (int) blue) {
+		if (curr.getValue().getRed() == (int) red && curr.getValue().getGreen() == (int) green
+				&& curr.getValue().getBlue() == (int) blue) {
 			return;
 		} else {
 			if (index == previousIndex + 1) {
 				if (tryMerge(curr, curr.getPrevious(), red, green, blue)) {
-					if (curr.getRunLength() == 0) {
+					if (curr.getValue().getRunLength() == 0) {
 						curr.getPrevious().setNext(curr.getNext());
 					}
 					return;
@@ -287,7 +287,7 @@ public class RunLengthEncoding implements Iterable {
 			}
 			if (index == currIndex) {
 				if (tryMerge(curr, curr.getNext(), red, green, blue)) {
-					if (curr.getRunLength() == 0) {
+					if (curr.getValue().getRunLength() == 0) {
 						curr.getNext().setPrevious(curr.getPrevious());
 					}
 					return;
@@ -305,10 +305,10 @@ public class RunLengthEncoding implements Iterable {
 			int red, int green, int blue) {
 		if (target == null)
 			return false;
-		if (target.getRed() == (int) red && target.getGreen() == (int) green
-				&& target.getBlue() == (int) blue) {
-			target.Increment();
-			curr.Decrement();
+		if (target.getValue().getRed() == (int) red && target.getValue().getGreen() == (int) green
+				&& target.getValue().getBlue() == (int) blue) {
+			target.getValue().Increment();
+			curr.getValue().Decrement();
 			return true;
 		}
 		return false;
@@ -317,13 +317,9 @@ public class RunLengthEncoding implements Iterable {
 	private void split(DoublyLinkedNode curr, int red, int green, int blue,
 			int previousRunLength, int nextRunLength) {
 		DoublyLinkedNode previousRun, nextRun;
-		previousRun = previousRunLength <= 0 ? curr.getPrevious()
-				: new DoublyLinkedNode(previousRunLength, (int) curr.getRed(),
-						(int) curr.getGreen(), (int) curr.getBlue());
-		nextRun = nextRunLength <= 0 ? curr.getNext() : new DoublyLinkedNode(
-				nextRunLength, (int) curr.getRed(), (int) curr.getGreen(),
-				(int) curr.getBlue());
-		curr.setValue(red, green, blue, 1);
+		previousRun = previousRunLength <= 0 ? curr.getPrevious() : new DoublyLinkedNode(new Run((int) curr.getValue().getRed(), (int) curr.getValue().getGreen(), (int) curr.getValue().getBlue(), previousRunLength));
+		nextRun = nextRunLength <= 0 ? curr.getNext() : new DoublyLinkedNode(new Run((int) curr.getValue().getRed(),(int) curr.getValue().getGreen(), (int) curr.getValue().getBlue(), nextRunLength));
+		curr.getValue().setValue(red, green, blue, 1);
 		if (previousRunLength > 0) {
 			if (curr.getPrevious() != null)
 				curr.getPrevious().setNext(previousRun);
