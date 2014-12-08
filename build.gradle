@@ -20,5 +20,6 @@ project(':project') {
   dependencies {
     testCompile 'junit:junit:4.11'
     compile files('libs/jai_core.jar')
+	compile files('libs/jai_codec.jar')
   }
 }
