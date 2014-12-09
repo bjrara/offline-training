@@ -34,12 +34,12 @@ public class DoublyLinkedList {
 		if (curr == head) {
 			head = curr.getNext();
 			head.setPrevious(null);
-			return;
+		} else {
+			curr.getPrevious().setNext(curr.getNext());
+			if (curr.getNext() != null)
+				curr.getNext().setPrevious(curr.getPrevious());
 		}
-		curr.getPrevious().setNext(curr.getNext());
-		if (curr.getNext() == null)
-			return;
-		curr.getNext().setPrevious(curr.getPrevious());
+		size--;
 	}
 
 }
