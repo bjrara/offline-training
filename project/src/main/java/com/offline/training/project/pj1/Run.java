@@ -7,6 +7,9 @@ public class Run {
 	private int runLength;
 
 	public Run(int red, int green, int blue, int runLength) {
+		if (!(validateColor(red) && validateColor(green) && validateColor(blue))) {
+			throw new RuntimeException("Invalid pixel value found!");
+		}
 		this.red = red;
 		this.green = green;
 		this.blue = blue;
@@ -14,6 +17,9 @@ public class Run {
 	}
 
 	public void setValue(int red, int green, int blue, int runLength) {
+		if (!(validateColor(red) && validateColor(green) && validateColor(blue))) {
+			throw new RuntimeException("Invalid pixel value found!");
+		}
 		this.red = red;
 		this.green = green;
 		this.blue = blue;
@@ -54,6 +60,14 @@ public class Run {
 
 	public void Increment() {
 		runLength++;
+	}
+	
+
+	private static boolean validateColor(int color) {
+		if (color >= 0 && color <= 255) {
+			return true;
+		}
+		return false;
 	}
 
 	public void Decrement() {

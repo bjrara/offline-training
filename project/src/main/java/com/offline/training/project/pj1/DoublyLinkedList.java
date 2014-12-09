@@ -5,12 +5,6 @@ public class DoublyLinkedList {
 	transient DoublyLinkedNode tail;
 	private int size;
 
-	public DoublyLinkedList(int[] red, int[] green, int[] blue, int[] runLengths) {
-		for (int i = 0; i < runLengths.length; i++) {
-			add(runLengths[i], red[i], green[i], blue[i]);
-		}
-	}
-
 	public DoublyLinkedList() {
 	}
 
@@ -22,11 +16,8 @@ public class DoublyLinkedList {
 		return size == 0;
 	}
 
-	public void add(int runLength, int red, int green, int blue) {
-		if (!(validateColor(red) && validateColor(green) && validateColor(blue))) {
-			throw new RuntimeException("Invalid pixel value found!");
-		}
-		DoublyLinkedNode appendObj = new DoublyLinkedNode(new Run(red, green, blue, runLength));
+	public void add(Run run) {
+		DoublyLinkedNode appendObj = new DoublyLinkedNode(run);
 		if (head == null) {
 			head = tail = appendObj;
 		} else {
@@ -51,10 +42,4 @@ public class DoublyLinkedList {
 		curr.getNext().setPrevious(curr.getPrevious());
 	}
 
-	private static boolean validateColor(int color) {
-		if (color >= 0 && color <= 255) {
-			return true;
-		}
-		return false;
-	}
 }

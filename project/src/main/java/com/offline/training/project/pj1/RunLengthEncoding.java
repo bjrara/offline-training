@@ -80,7 +80,10 @@ public class RunLengthEncoding implements Iterable {
 	  }
 	  this.width = width;
 	  this.height = height;
-	  this.runs = new DoublyLinkedList(red, green, blue, runLengths);
+	  this.runs = new DoublyLinkedList();
+	  for (int i = 0; i < runLengths.length; i++) {
+		  this.runs.add(new Run(red[i], green[i], blue[i], runLengths[i]));
+	  }
   }
 
   private boolean validate(int width, int height, int redLength, int greenLength,
@@ -199,8 +202,8 @@ public class RunLengthEncoding implements Iterable {
 		for (int y = 0; y < image.getHeight(); y++) {
 			for (int x = 0; x < image.getWidth(); x++) {
 				if (runs.tail == null) {
-					runs.add(1, image.getRed(0, 0), image.getGreen(0, 0),
-							image.getBlue(0, 0));
+					runs.add(new Run(image.getRed(0, 0), image.getGreen(0, 0),
+							image.getBlue(0, 0), 1));
 					continue;
 				}
 				if (runs.tail.getValue().getRed() == (int) image.getRed(x, y)
@@ -208,9 +211,9 @@ public class RunLengthEncoding implements Iterable {
 						&& runs.tail.getValue().getBlue() == (int) image.getBlue(x, y)) {
 					runs.tail.getValue().Increment();
 				} else {
-					runs.add(1, (int) image.getRed(x, y),
+					runs.add(new Run((int) image.getRed(x, y),
 							(int) image.getGreen(x, y),
-							(int) image.getBlue(x, y));
+							(int) image.getBlue(x, y), 1));
 				}
 			}
 		}
