@@ -280,7 +280,12 @@ public class RunLengthEncoding implements Iterable {
 			if (index == previousIndex + 1) {
 				if (tryMerge(curr, curr.getPrevious(), red, green, blue)) {
 					if (curr.getValue().getRunLength() == 0) {
-						curr.getPrevious().setNext(curr.getNext());
+						curr = curr.getPrevious();
+						runs.remove(curr.getNext());
+					}
+					if (curr.getNext() != null && curr.getValue().compare(curr.getNext().getValue())) {
+						curr.getValue().setRunLength(curr.getValue().getRunLength() + curr.getNext().getValue().getRunLength());
+						curr.setNext(curr.getNext().getNext());
 					}
 					return;
 				}
@@ -288,15 +293,18 @@ public class RunLengthEncoding implements Iterable {
 			if (index == currIndex) {
 				if (tryMerge(curr, curr.getNext(), red, green, blue)) {
 					if (curr.getValue().getRunLength() == 0) {
-						curr.getNext().setPrevious(curr.getPrevious());
+						curr = curr.getNext();
+						runs.remove(curr.getPrevious());
+					}
+					if (curr.getPrevious() != null && curr.getValue().compare(curr.getPrevious().getValue())) {
+						curr.getValue().setRunLength(curr.getValue().getRunLength() + curr.getPrevious().getValue().getRunLength());
+						curr.setPrevious(curr.getPrevious().getPrevious());
 					}
 					return;
 				}
 			}
 			split(curr, red, green, blue, 
 					index - previousIndex - 1, currIndex - index);
-			if (curr == runs.head && curr.getPrevious() != null)
-				runs.head = curr.getPrevious();
 		}
 		check();
 	}
@@ -334,6 +342,8 @@ public class RunLengthEncoding implements Iterable {
 		}
 		curr.setPrevious(previousRun);
 		curr.setNext(nextRun);
+		if (curr == runs.head && curr.getPrevious() != null)
+			runs.head = curr.getPrevious();
   }
 
 

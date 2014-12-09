@@ -59,4 +59,10 @@ public class Run {
 	public void Decrement() {
 		runLength--;
 	}
+
+	public boolean compare(Run another) {
+		if (another == null)
+			return false;
+		return red == another.red && green == another.green && blue == another.blue;
+	}
 }

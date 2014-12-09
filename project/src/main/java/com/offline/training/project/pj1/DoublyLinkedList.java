@@ -30,11 +30,25 @@ public class DoublyLinkedList {
 		if (head == null) {
 			head = tail = appendObj;
 		} else {
-	appendObj.setPrevious(tail);
+			appendObj.setPrevious(tail);
 			tail.setNext(appendObj);
 			tail = tail.getNext();
 		}
 		size++;
+	}
+
+	public void remove(DoublyLinkedNode curr) {
+		if (curr == null)
+			return;
+		if (curr == head) {
+			head = curr.getNext();
+			head.setPrevious(null);
+			return;
+		}
+		curr.getPrevious().setNext(curr.getNext());
+		if (curr.getNext() == null)
+			return;
+		curr.getNext().setPrevious(curr.getPrevious());
 	}
 
 	private static boolean validateColor(int color) {
