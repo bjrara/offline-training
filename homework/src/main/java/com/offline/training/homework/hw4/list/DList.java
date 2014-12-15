@@ -71,8 +71,8 @@ public class DList extends List {
    **/
   public void insertFront(Object item) {
 	  DListNode newNode = newNode(item, this, head, head.next);
+	  head.next.prev = newNode;
 	  head.next = newNode;
-	  newNode.next.prev = newNode;
 	  size++;
   }
 
@@ -85,8 +85,8 @@ public class DList extends List {
    **/
   public void insertBack(Object item) {
 	  DListNode newNode = newNode(item, this, head.prev, head);
+	  head.prev.next = newNode;
 	  head.prev = newNode;
-	  newNode.prev.next = newNode;
 	  size++;
   }
 

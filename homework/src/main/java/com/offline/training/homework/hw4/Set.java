@@ -10,6 +10,7 @@ import com.offline.training.homework.hw4.list.*;
  **/
 public class Set {
   /* Fill in the data fields here. */
+	private List list;
 
   /**
    * Set ADT invariants:
@@ -25,7 +26,7 @@ public class Set {
    *  Performance:  runs in O(1) time.
    **/
   public Set() { 
-    // Your solution here.
+	  list = new DList();
   }
 
   /**
@@ -34,8 +35,7 @@ public class Set {
    *  Performance:  runs in O(1) time.
    **/
   public int cardinality() {
-    // Replace the following line with your solution.
-    return 0;
+    return list.length();
   }
 
   /**
@@ -45,9 +45,30 @@ public class Set {
    *  compareTo() method of the java.lang.Comparable interface.
    *
    *  Performance:  runs in O(this.cardinality()) time.
+ * @throws InvalidNodeException 
    **/
-  public void insert(Comparable c) {
-    // Your solution here.
+  public void insert(Comparable c) throws InvalidNodeException {
+	  if (list.isEmpty()) {
+		  list.insertFront(c);
+		  return;
+	  }
+	  if (c.compareTo(list.front()) < 0) {
+		  list.insertFront(c);
+		  return;
+	  }
+	  if (c.compareTo(list.back()) > 0) {
+		  list.insertBack(c);
+		  return;
+	  }
+	  ListNode node = list.front();
+	  while(node.isValidNode()) {
+		  int result = c.compareTo(node.item());
+		  if (result == 0)
+			  return;
+		  if (result < 0)
+			  node.insertBefore(c);
+		  node = node.next();
+	  }
   }
 
   /**
@@ -66,7 +87,6 @@ public class Set {
    *  DO NOT ATTEMPT TO COPY ELEMENTS; just copy _references_ to them.
    **/
   public void union(Set s) {
-    // Your solution here.
   }
 
   /**

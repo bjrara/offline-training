@@ -94,9 +94,10 @@ public class DListNode extends ListNode {
       throw new InvalidNodeException("insertAfter() called on invalid node");
     }
     DList dList = (DList)myList;
-    DListNode newNode = dList.newNode(item, myList, this, next);
-    next.next.prev = newNode;
+    DListNode newNode = dList.newNode(item, dList, this, next);
+    next.prev = newNode;
     next = newNode;
+    myList.size++;
   }
 
   /**
@@ -112,11 +113,11 @@ public class DListNode extends ListNode {
     if (!isValidNode()) {
       throw new InvalidNodeException("insertBefore() called on invalid node");
     }
-    // Your solution here.  Will look something like your Homework 4 solution,
-    //   but changes are necessary.  For instance, there is no need to check if
-    //   "this" is null.  Remember that this node's "myList" field tells you
-    //   what DList it's in.  You should use myList.newNode() to create the
-    //   new node.
+    DList dList = (DList)myList;
+    DListNode newNode = dList.newNode(item, dList, prev, this);
+    prev.next = newNode;
+    prev = newNode;
+    myList.size++;
   }
 
   /**
@@ -131,12 +132,9 @@ public class DListNode extends ListNode {
     if (!isValidNode()) {
       throw new InvalidNodeException("remove() called on invalid node");
     }
-    // Your solution here.  Will look something like your Homework 4 solution,
-    //   but changes are necessary.  For instance, there is no need to check if
-    //   "this" is null.  Remember that this node's "myList" field tells you
-    //   what DList it's in.
-
-
+    prev.next = next;
+    next.prev = prev;
+    myList.size--;
 
     // Make this node an invalid node, so it cannot be used to corrupt myList.
     myList = null;
