@@ -47,28 +47,37 @@ public class Set {
    *  Performance:  runs in O(this.cardinality()) time.
  * @throws InvalidNodeException 
    **/
-  public void insert(Comparable c) throws InvalidNodeException {
-	  if (list.isEmpty()) {
-		  list.insertFront(c);
-		  return;
-	  }
-	  if (c.compareTo(list.front()) < 0) {
-		  list.insertFront(c);
-		  return;
-	  }
-	  if (c.compareTo(list.back()) > 0) {
-		  list.insertBack(c);
-		  return;
-	  }
-	  ListNode node = list.front();
-	  while(node.isValidNode()) {
-		  int result = c.compareTo(node.item());
-		  if (result == 0)
-			  return;
-		  if (result < 0)
-			  node.insertBefore(c);
-		  node = node.next();
-	  }
+  public void insert(Comparable c) {
+		if (list.isEmpty()) {
+			list.insertFront(c);
+			return;
+		}
+		try {
+			if (c.compareTo(list.front().item()) < 0) {
+				list.insertFront(c);
+				return;
+			}
+			if (c.compareTo(list.back().item()) > 0) {
+				list.insertBack(c);
+				return;
+			}
+			ListNode node = list.front();
+			while (node.isValidNode()) {
+				int result;
+
+				result = c.compareTo(node.item());
+				if (result == 0)
+					return;
+				if (result < 0)
+					node.insertBefore(c);
+				else
+					node = node.next();
+
+			}
+		} catch (InvalidNodeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
   }
 
   /**
@@ -87,6 +96,38 @@ public class Set {
    *  DO NOT ATTEMPT TO COPY ELEMENTS; just copy _references_ to them.
    **/
   public void union(Set s) {
+		ListNode thisNode = list.front();
+		ListNode anotherNode = s.list.front();
+		while (thisNode.isValidNode() && anotherNode.isValidNode()) {
+			try {
+				Comparable thisItem = (Comparable) thisNode.item();
+				Comparable anotherItem = (Comparable) anotherNode.item();
+				if (thisItem.compareTo(anotherItem) == 0) {
+					thisNode = thisNode.next();
+					anotherNode = anotherNode.next();
+					continue;
+				}
+				if (thisItem.compareTo(anotherItem) < 0) {
+					thisNode = thisNode.next();
+					continue;
+				}
+				if (thisItem.compareTo(anotherItem) > 0) {
+					thisNode.insertBefore(anotherItem);
+				}
+			} catch (InvalidNodeException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		while (anotherNode.isValidNode()) {
+			try {
+				list.insertBack(anotherNode.item());
+				anotherNode = anotherNode.next();
+			} catch (InvalidNodeException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
   }
 
   /**
@@ -103,7 +144,37 @@ public class Set {
    *  DO NOT ATTEMPT TO COPY ELEMENTS.
    **/
   public void intersect(Set s) {
-    // Your solution here.
+		ListNode thisNode = list.front();
+		ListNode anotherNode = s.list.front();
+		while (thisNode.isValidNode() && anotherNode.isValidNode()) {
+			try {
+				Comparable thisItem = (Comparable) thisNode.item();
+				Comparable anotherItem = (Comparable) anotherNode.item();
+				if (thisItem.compareTo(anotherItem) == 0) {
+					thisNode = thisNode.next();
+					anotherNode = anotherNode.next();
+					continue;
+				}
+				if (thisItem.compareTo(anotherItem) < 0) {
+					thisNode.remove();
+					continue;
+				}
+				if (thisItem.compareTo(anotherItem) > 0) {
+					anotherNode = anotherNode.next();
+				}
+			} catch (InvalidNodeException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		while (thisNode.isValidNode()) {
+			try {
+				thisNode.remove();
+			} catch (InvalidNodeException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
   }
 
   /**
@@ -122,8 +193,20 @@ public class Set {
    *            DEVIATIONS WILL LOSE POINTS.
    **/
   public String toString() {
-    // Replace the following line with your solution.
-    return "";
+	  if (list.isEmpty())
+		  return "{  }";
+	  ListNode node = list.front();
+	  String desc = "{ ";
+	  while(node.isValidNode()) {
+		  try {
+			desc += node.item().toString() + " ";
+			node = node.next();
+		} catch (InvalidNodeException e) {
+			e.printStackTrace();
+		}
+	  }
+	  desc += "}";
+	  return desc;
   }
 
   public static void main(String[] argv) {
