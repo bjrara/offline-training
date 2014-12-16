@@ -68,8 +68,10 @@ public class Set {
 				result = c.compareTo(node.item());
 				if (result == 0)
 					return;
-				if (result < 0)
+				if (result < 0) {
 					node.insertBefore(c);
+					return;
+				}
 				else
 					node = node.next();
 
@@ -113,6 +115,7 @@ public class Set {
 				}
 				if (thisItem.compareTo(anotherItem) > 0) {
 					thisNode.insertBefore(anotherItem);
+					anotherNode = anotherNode.next();
 				}
 			} catch (InvalidNodeException e) {
 				// TODO Auto-generated catch block
@@ -156,7 +159,9 @@ public class Set {
 					continue;
 				}
 				if (thisItem.compareTo(anotherItem) < 0) {
+					ListNode temp = thisNode.next();
 					thisNode.remove();
+					thisNode = temp;
 					continue;
 				}
 				if (thisItem.compareTo(anotherItem) > 0) {
@@ -169,7 +174,9 @@ public class Set {
 		}
 		while (thisNode.isValidNode()) {
 			try {
+				ListNode temp = thisNode.next();
 				thisNode.remove();
+				thisNode = temp;
 			} catch (InvalidNodeException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
