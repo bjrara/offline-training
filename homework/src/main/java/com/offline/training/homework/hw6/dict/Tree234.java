@@ -129,13 +129,19 @@ public class Tree234 extends IntDictionary {
 			  return;
 	  }
 
-	  if(key < targetNode.key1) {
+	  if (key < targetNode.key1) {
 		  targetNode.key3 = targetNode.key2;
 		  targetNode.key2 = targetNode.key1;
 		  targetNode.key1 = key;
+	  } else if (key == targetNode.key1) {
+		  return;
 	  } else if(targetNode.keys == 1 || key < targetNode.key2){
 		  targetNode.key3 = targetNode.key2;
 		  targetNode.key2 = key;
+	  } else if (key == targetNode.key2) {
+		  return;
+	  } else if (key == targetNode.key3) {
+		  return;
 	  } else {
 		  targetNode.key3 = key;
 	  }
@@ -183,9 +189,6 @@ public class Tree234 extends IntDictionary {
 		  root.child2 = child2;
 		  return root;
 	  }
-
-	  if (node.parent.isFull())
-		  split(node.parent);
 
 	  // here parent is guaranteed to be not full
 	  Tree234Node parent = node.parent;
@@ -372,8 +375,20 @@ public class Tree234 extends IntDictionary {
     t.testHelper("(((1 4)7(11 16))22((23)28(37 49)))50(((51)60(66)75" +
                  "(80 81))84((86)95(99 100)))");
 
+    testDuplicate(t);
+
     System.out.println("\nFinal tree:");
     t.printTree();
+  }
+
+  private static void testDuplicate(Tree234 t) {
+	  String origin = t.toString();
+	  System.out.println("\nDuplicating 80, 50, 37, 1.");
+	  t.insert(80);
+	  t.insert(50);
+	  t.insert(37);
+	  t.insert(1);
+	  t.testHelper(origin);
   }
 
 }
