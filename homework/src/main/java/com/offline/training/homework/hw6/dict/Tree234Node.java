@@ -39,6 +39,18 @@ class Tree234Node {
     child4 = null;
   }
 
+  public boolean isLeafNode() {
+	  return child1 == null;
+  }
+
+  public boolean isRootNode() {
+	  return parent == null;
+  }
+
+  public boolean isFull() {
+	  return keys == 3;
+  }
+
   /**
    *  toString() recursively prints this Tree234Node and its descendants as
    *  a String.  Each node is printed in the form such as (for a 3-key node)

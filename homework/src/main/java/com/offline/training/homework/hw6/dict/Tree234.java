@@ -101,9 +101,162 @@ public class Tree234 extends IntDictionary {
    *  @param key is the key sought.
    **/
   public void insert(int key) {
-    // Fill in your solution here.
+	  if (root == null)
+		  root = new Tree234Node(null, key);
+	  else
+		  insert(key, root);
   }
 
+  public void insert(int key, Tree234Node node) {
+	  Tree234Node targetNode = node;
+	  // split if full while traversing
+	  while (!targetNode.isLeafNode()) {
+		  if (targetNode.isFull()) {
+			  targetNode = split(targetNode);
+		  }
+		  targetNode = goNext(targetNode, key);
+		  if (targetNode == null)
+			  return;
+	  }
+
+	  // split leaf node if full
+	  if (targetNode.isFull()) {
+		  targetNode = split(targetNode);
+	  }
+	  while (!targetNode.isLeafNode()) {
+		  targetNode = goNext(targetNode, key);
+		  if (targetNode == null)
+			  return;
+	  }
+
+	  if(key < targetNode.key1) {
+		  targetNode.key3 = targetNode.key2;
+		  targetNode.key2 = targetNode.key1;
+		  targetNode.key1 = key;
+	  } else if(targetNode.keys == 1 || key < targetNode.key2){
+		  targetNode.key3 = targetNode.key2;
+		  targetNode.key2 = key;
+	  } else {
+		  targetNode.key3 = key;
+	  }
+	  targetNode.keys++;
+  }
+
+  private Tree234Node goNext(Tree234Node currentNode, int key) {
+	  if (key < currentNode.key1) {
+		  return currentNode.child1;
+	  } else if (key == currentNode.key1) {
+		  return null;
+	  } else if ((currentNode.keys == 1) || (key < currentNode.key2)) {
+		  return currentNode.child2;
+	  } else if (key == currentNode.key2) {
+		  return null;
+	  } else if ((currentNode.keys == 2) || (key < currentNode.key3)) {
+		  return currentNode.child3;
+	  } else if (key == currentNode.key3) {
+		  return null;
+	  } else {
+		  return currentNode.child4;
+	  }
+  }
+
+  private Tree234Node split(Tree234Node node) {
+	  int key = node.key2;
+	  Tree234Node child1 = new Tree234Node(null, node.key1);
+	  child1.child1 = node.child1;
+	  child1.child2 = node.child2;
+	  Tree234Node child2 = new Tree234Node(null, node.key3);
+	  child2.child1 = node.child3;
+	  child2.child2 = node.child4;
+	  if (!node.isLeafNode()) {
+		  node.child1.parent = child1;
+		  node.child2.parent = child1;
+		  node.child3.parent = child2;
+		  node.child4.parent = child2;
+	  }
+
+	  if (node.isRootNode()) {
+		  root = new Tree234Node(null, node.key2);
+		  child1.parent = root;
+		  child2.parent = root;
+		  root.child1 = child1;
+		  root.child2 = child2;
+		  return root;
+	  }
+
+	  if (node.parent.isFull())
+		  split(node.parent);
+
+	  // here parent is guaranteed to be not full
+	  Tree234Node parent = node.parent;
+	  switch (parent.keys) {
+		case 1: {
+			if (parent.child1 == node)
+				insertFront(parent, key, child1, child2);
+			else
+				insertBack(parent, key, child1, child2);
+			break;
+		}
+		case 2: {
+			if (parent.child1 == node)
+				insertFront(parent, key, child1, child2);
+			else if (parent.child2 == node)
+				insertMiddle(parent, key, child1, child2);
+			else
+				insertBack(parent, key, child1, child2);
+			break;
+		}
+	  }
+	  return parent;
+  }
+
+  private void insertBack(Tree234Node mergingNode, int key, Tree234Node leftChild, Tree234Node rightChild) {
+	  leftChild.parent = mergingNode;
+	  rightChild.parent = mergingNode;
+	  switch(mergingNode.keys) {
+		  case 1: {
+			  mergingNode.key2 = key;
+			  mergingNode.child2 = leftChild;
+			  mergingNode.child3 = rightChild;
+			  break;
+		  }
+		  case 2: {
+			  mergingNode.key3 = key;
+			  mergingNode.child3 = leftChild;
+			  mergingNode.child4 = rightChild;
+			  break;
+		  }
+	  }
+	  mergingNode.keys++;
+  }
+
+  private void insertFront(Tree234Node mergingNode, int key, Tree234Node leftChild, Tree234Node rightChild) {
+	  leftChild.parent = mergingNode;
+	  rightChild.parent = mergingNode;
+	  if (mergingNode.keys == 2) {
+		  mergingNode.key3 = mergingNode.key2;
+		  mergingNode.child4 = mergingNode.child3;
+	  }
+	  mergingNode.key2 = mergingNode.key1;
+	  mergingNode.key1 = key;
+	  mergingNode.child3 = mergingNode.child2;
+	  mergingNode.child2 = rightChild;
+	  mergingNode.child1 = leftChild;
+	  mergingNode.keys++;
+  }
+
+  private void insertMiddle(Tree234Node mergingNode, int key, Tree234Node leftChild, Tree234Node rightChild) {
+	  leftChild.parent = mergingNode;
+	  rightChild.parent = mergingNode;
+	  if (mergingNode.keys != 2)
+		  throw new RuntimeException("insert to middle requires 2 keys in merging node!");
+	  mergingNode.key3 = mergingNode.key2;
+	  mergingNode.child4 = mergingNode.child3;
+	  mergingNode.key2 = key;
+	  mergingNode.child3 = rightChild;
+	  mergingNode.child2 = leftChild;
+	  mergingNode.keys++;
+  }
 
   /**
    *  testHelper() prints the String representation of this tree, then
